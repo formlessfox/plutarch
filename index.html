@@ -6,7 +6,15 @@
     <title>Plutarch's Lives Timeline</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Version: Timeline 1.3 (Static Content - No API - No Interactions) - May 24, 2025 */
+        /* Global Box Sizing for consistent layout */
+        html {
+            box-sizing: border-box;
+        }
+        *, *:before, *:after {
+            box-sizing: inherit;
+        }
+
+        /* Version: Timeline 1.4 (Responsiveness improvements) - May 24, 2025 */
         body {
             font-family: "Inter", sans-serif;
             background-color: #f0f4f8; /* Opaque */
@@ -16,7 +24,10 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            min-height: 100vh;
+            min-height: 100vh; /* Ensure it takes at least full viewport height */
+            /* **NEW:** Explicitly set body width and prevent its own horizontal scroll */
+            width: 100vw;
+            overflow-x: hidden;
         }
         .timeline-container {
             position: relative;
@@ -26,9 +37,13 @@
             padding: 20px;
             margin-top: 20px;
             display: flex;
-            width: fit-content; /* Adjust width based on content (number of lanes) */
+            width: 100%; /* Make container take full available width of its parent (iframe body) */
+            max-width: 1200px; /* Optional: limit max width on very large screens */
             overflow-y: hidden; /* Prevent vertical scrolling on the container itself */
-            overflow-x: auto; /* Ensure horizontal scroll if content is wider than screen */
+            /* **KEY CHANGE:** Ensure horizontal scroll and enhance touch scrolling */
+            overflow-x: auto !important; /* Add !important to override potential Google Sites styles */
+            -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+            box-sizing: border-box; /* Crucial for consistent sizing */
         }
         .timeline-header {
             text-align: center;
@@ -59,8 +74,8 @@
 
         .year-vertical-axis {
             position: relative;
-            width: 350px;
-            flex-shrink: 0;
+            width: 350px; /* Base width */
+            flex-shrink: 0; /* **IMPORTANT:** Prevents axis from shrinking below its width */
             border-right: 1px solid #ccc; /* Opaque */
             padding-right: 10px;
             box-sizing: border-box;
@@ -86,7 +101,8 @@
             flex-grow: 1;
             padding-left: 10px;
             box-sizing: border-box;
-            min-width: 500px;
+            /* min-width will be set by JS based on lanes, ensuring scrollability */
+            flex-shrink: 0; /* **IMPORTANT:** Prevents content area from shrinking below its calculated min-width */
         }
 
         .grid-line {
@@ -99,13 +115,13 @@
 
         .character-bar {
             position: absolute;
-            width: 120px;
+            width: 120px; /* Base width */
             border-radius: 6px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 10px 5px;
+            padding: 10px 5px; /* Base padding */
             color: white; /* Opaque text color */
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
             transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
@@ -121,7 +137,7 @@
         }
 
         .character-name {
-            font-size: 0.9rem;
+            font-size: 0.9rem; /* Base font size */
             font-weight: 600;
             white-space: normal;
             writing-mode: initial;
@@ -136,7 +152,7 @@
         }
 
         .character-dates {
-            font-size: 0.75rem;
+            font-size: 0.75rem; /* Base font size */
             opacity: 0.9;
             white-space: normal;
             padding: 0;
@@ -217,7 +233,6 @@
             line-height: 1.6;
             color: #444;
         }
-        /* No loading spinners needed for static content */
         .character-link {
             color: #3b82f6;
             cursor: pointer;
@@ -227,6 +242,101 @@
         }
         .character-link:hover {
             color: #2563eb;
+        }
+
+        /* --- RESPONSIVENESS (MEDIA QUERIES) --- */
+        /* For screens up to 768px wide (tablets) */
+        @media (max-width: 768px) {
+            .timeline-container {
+                padding: 10px; /* Reduce container padding */
+            }
+            .year-vertical-axis {
+                width: 120px; /* Smaller axis width for tablets */
+                padding-right: 5px;
+            }
+            .axis-label {
+                font-size: 0.7rem; /* Smaller font for axis labels */
+            }
+            .character-bar {
+                width: 90px; /* Smaller bar width for tablets */
+                padding: 8px 3px; /* Smaller padding */
+            }
+            .character-name {
+                font-size: 0.75rem; /* Smaller font for names */
+            }
+            .character-dates {
+                font-size: 0.65rem; /* Smaller font for dates */
+            }
+            .timeline-legend {
+                font-size: 14px;
+            }
+            .modal-content {
+                padding: 15px;
+                width: 95%;
+            }
+            .modal-title {
+                font-size: 1.2rem;
+                margin-bottom: 10px;
+            }
+            .modal-section-title {
+                font-size: 1rem;
+                margin-top: 10px;
+                margin-bottom: 5px;
+            }
+            .modal-body {
+                font-size: 0.9rem;
+            }
+        }
+
+        /* For screens up to 480px wide (phones) */
+        @media (max-width: 480px) {
+            body {
+                padding: 0; /* Remove body padding on very small screens */
+            }
+            .timeline-container {
+                padding: 5px; /* Even smaller padding for phones */
+                margin-top: 10px;
+            }
+            .timeline-header {
+                font-size: 16px;
+            }
+            .timeline-legend {
+                font-size: 13px;
+                gap: 10px;
+            }
+            .year-vertical-axis {
+                width: 80px; /* Even smaller axis width for phones */
+            }
+            .axis-label {
+                font-size: 0.6rem; /* Even smaller font for axis labels */
+            }
+            .character-bar {
+                width: 70px; /* Even smaller bar width for phones */
+                padding: 5px 2px;
+            }
+            .character-name {
+                font-size: 0.65rem;
+            }
+            .character-dates {
+                font-size: 0.55rem;
+            }
+            .modal-content {
+                padding: 10px;
+            }
+            .modal-close-btn {
+                font-size: 1.2rem;
+                top: 5px;
+                right: 10px;
+            }
+            .modal-title {
+                font-size: 1.1rem;
+            }
+            .modal-section-title {
+                font-size: 0.95rem;
+            }
+            .modal-body {
+                font-size: 0.85rem;
+            }
         }
     </style>
 </head>
@@ -272,24 +382,17 @@
                 <div class="modal-body" id="comparisonCharacterOutput"></div>
             </div>
 
-            <!--
-            <div id="interactingCharactersSection">
-                <div class="modal-section-title">Interacted With</div>
-                <div class="modal-body" id="interactingCharactersOutput"></div>
-            </div>
-            -->
-
         </div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // Version: Timeline 1.3 (Static Content - No API - No Interactions) - May 24, 2025
+            // Version: Timeline 1.4 (Responsiveness improvements) - May 24, 2025
             // Data with static text content
             const characters = [
                 { name: "Lycurgus", type: "Greek", start: -700, end: -630,
                   lifeSummary: "Lycurgus is the legendary founder of Sparta's distinctive political order and many of its foundational social institutions, including the 'Great Rhetra' (oral constitution). His reforms are credited with transforming Sparta from a state of 'extreme political disorder' to one of 'good order' and 'increased power.' While his historicity is debated, with many scholars believing he represents a series of revolutionary changes over time rather than a single individual, his figure maintained immense cultural and civic significance throughout antiquity, embodying Sparta's core values. He is sometimes said to have received laws from Apollo or imitated customs from Dorian Crete.",
-                  accomplishments: "<ul><li>Established the 'Great Rhetra,' Sparta's foundational (oral) constitution.</li><li>Credited with creating key institutions such as the Gerousia (council of elders) and the ephorate (magistrates).</li><li>Instituted the Agoge, a rigorous state-controlled education system for all male citizens focusing on physical endurance, combat skills, and loyalty.</li><li>Introduced Syssitia (communal meals) to foster camaraderie and discourage luxury among citizens.</li><li>Reportedly implemented land redistribution (kleroi) to ensure economic equality among Spartiates.</li><li>Abolished debts and introduced iron bars as currency to discourage wealth accumulation and promote focus on military virtues.</li><li>Reformed marriage and family practices, emphasizing the production of 'vigorous offspring' and allowing for arrangements to ensure 'fine children.'</li><li>Developed new tactics and standardized military training, making the hoplite phalanx the cornerstone of Spartan warfare and producing 'the most powerful army standing in Greece.'</li></ul>",
+                  accomplishments: "<ul><li>Established the 'Great Rhetra,' Sparta's foundational (oral) constitution.</li><li>Credited with creating key institutions such as the Gerousia (council of elders) and the ephorate (magistrates).</li><li>Instituted the Agoge, a rigorous state-controlled education system for all male citizens focusing on physical endurance, combat skills, and loyalty.</li><li>Introduced Syssitia (communal meals) to foster camaraderie and discourage luxury among citizens.</li><li>Reportedly implemented land redistribution (kleroi) to ensure economic equality among Spartiates.</li><li>Abolished debts and introduced iron bars as currency to discourage wealth accumulation and promote focus on military virtues.</li><li>Developed new tactics and standardized military training, making the hoplite phalanx the cornerstone of Spartan warfare and producing 'the most powerful army standing in Greece.'</li></ul>",
                   legacy: "Lycurgus's reforms profoundly shaped Sparta into a highly disciplined, militarized society renowned for its stability and military prowess. His system fostered an egalitarian society among Spartiate citizens by suppressing individual wealth and luxury, directing all efforts toward the collective good. The unique status of Spartan women, with more property rights and public roles than in other Greek city-states, was also a consequence of his reforms, though still geared towards producing warriors. The Lycurgan system ensured Sparta's influence in the Greek world, leading to its formidable reputation and crucial roles in the Greco-Persian Wars and the Peloponnesian War. However, Aristotle critically noted that the system's singular focus on military valor led to Sparta's decline once it acquired an empire, as it lacked other capacities like economic diversification, intellectual growth, and diplomatic flexibility. The existence of the Helot underclass, whose forced labor supported the Spartiate system, remains a critical, often overlooked, aspect of the Lycurgan legacy."
                 },
                 { name: "Solon", type: "Greek", start: -638, end: -558,
@@ -392,7 +495,7 @@
                   accomplishments: "<ul><li>Delivered numerous influential speeches (orations) that shaped Athenian public opinion and policy.</li><li>Consistently championed Athenian independence and democratic values against Macedonian expansionism.</li><li>Played a key role in forming alliances against Philip II, culminating in the Battle of Chaeronea.</li><li>Known for his rigorous self-training in rhetoric and his mastery of persuasive argumentation.</li></ul>",
                   legacy: "Demosthenes' legacy is primarily his unparalleled oratorical skill and his unwavering dedication to Athenian freedom. His speeches remain masterpieces of political rhetoric, studied for their persuasive power and literary brilliance. Despite his efforts, Athens ultimately fell under Macedonian control, making him a symbol of heroic but ultimately futile resistance against overwhelming power. His life also highlights the intense political debates and personal rivalries that characterized Athenian democracy."
                 },
-                { name: "Demetrius", type: "Roman", start: -320, end: -283,
+                { name: "Demetrius", type: "Greek", start: -320, end: -283,
                   lifeSummary: "Demetrius Poliorcetes ('Besieger of Cities') was a Macedonian king, son of Antigonus I Monophthalmus, one of Alexander the Great's Diadochi. He was known for his flamboyant personality, military innovations (especially in siege warfare), and ambitious attempts to restore Alexander's empire.",
                   accomplishments: "<ul><li>A master of siege warfare, inventing and employing massive siege engines, earning him his epithet 'Poliorcetes'.</li><li>Briefly ruled Macedon as king (294-288 BC).</li><li>Restored the Athenian democracy (307 BC) and was deified by the Athenians as a savior.</li><li>Engaged in extensive naval campaigns and land battles against other Diadochi to establish his family's dominance.</li></ul>",
                   legacy: "Demetrius was a brilliant but erratic general whose audacious campaigns and engineering feats left a lasting impression on Hellenistic warfare. His life was a series of dramatic ups and downs, marked by both stunning victories and crushing defeats. He represents the restless ambition and constant warfare that characterized the Diadochi period, as Alexander's generals fought over the fragments of his empire. His deification by Athens underscores the shifting political landscape and the use of divine honors for powerful rulers in the Hellenistic world."
@@ -409,7 +512,7 @@
                 },
                 { name: "Artaxerxes", type: "Greek", start: -440, end: -358,
                   lifeSummary: "Artaxerxes II Mnemon was a king of the Achaemenid Empire (Persia) whose exceptionally long reign (404–358 BC) was marked by numerous internal rebellions and ongoing conflicts with the Greek city-states. He successfully navigated these challenges, maintaining the vast Persian Empire's integrity.",
-                  accomplishments: "<ul><li>Successfully suppressed the rebellion of his younger brother Cyrus the Younger at the Battle of Cunaxa (401 BC).</li><li>Issued the **King's Peace** (also known as the Peace of Antalcidas) in 387 BC, which significantly influenced Greek politics by dictating terms to the warring city-states.</li><li>Maintained control over the vast Persian Empire, despite numerous satrapal revolts.</li><li>Engaged in various conflicts with Greek states, often playing them against each other to maintain Persian influence.</li></ul>",
+                  accomplishments: "<ul><li>Successfully suppressed the rebellion of his younger brother Cyrus the Younger at the **Battle of Cunaxa** (401 BC).</li><li>Issued the **King's Peace** (also known as the Peace of Antalcidas) in 387 BC, which significantly influenced Greek politics by dictating terms to the warring city-states.</li><li>Maintained control over the vast Persian Empire, despite numerous satrapal revolts.</li><li>Engaged in various conflicts with Greek states, often playing them against each other to maintain Persian influence.</li></ul>",
                   legacy: "Artaxerxes II's reign saw Persia continue to be a dominant force in the Near East and a significant player in Greek affairs. The King's Peace, dictated by Persia, underscored its power and influence over the fragmented Greek world. While his reign was not marked by grand conquests, his ability to suppress rebellions and maintain the empire's vast territory for over 40 years demonstrates his political resilience and administrative capacity, even as the empire slowly began its decline."
                 },
                 { name: "Romulus", type: "Roman", start: -771, end: -717,
@@ -480,7 +583,7 @@
                 { name: "Crassus", type: "Roman", start: -115, end: -53,
                   lifeSummary: "Marcus Licinius Crassus was a Roman general, politician, and arguably the wealthiest man in Rome, known for his ambition and ruthless pursuit of power and riches. He was a key member of the First Triumvirate, alongside Julius Caesar and Pompey, which dominated Roman politics in the late Republic.",
                   accomplishments: "<ul><li>Successfully suppressed the **Spartacus slave revolt** (71 BC), though Pompey famously claimed much of the credit.</li><li>Amassed immense wealth through various means, including real estate speculation, mining, and exploiting Sulla's proscriptions.</li><li>Formed the **First Triumvirate** (60 BC) with Caesar and Pompey, a powerful political alliance that circumvented the Senate.</li><li>Served as consul twice and censor once.</li><li>His ambition for military glory led him to command a disastrous campaign against the Parthian Empire.</li></ul>",
-                  legacy: "Crassus's insatiable ambition for military glory ultimately led to his catastrophic defeat and death at the **Battle of Carrhae** (53 BC) against the Parthians. His death destabilized the First Triumvirate, removing the crucial balance between Caesar and Pompey, and directly contributed to the outbreak of civil war. He represents the corrupting influence of wealth and ambition in the late Republic, and his pursuit of military fame at any cost had profound and tragic consequences for Rome."
+                  legacy: "Crassus's insatiable ambition for military glory ultimately led to his catastrophic defeat and death at the **Battle of Carrhae** (53 BC) against the Parthian. His death destabilized the First Triumvirate, removing the crucial balance between Caesar and Pompey, and directly contributed to the outbreak of civil war. He represents the corrupting influence of wealth and ambition in the late Republic, and his pursuit of military fame at any cost had profound and tragic consequences for Rome."
                 },
                 { name: "Sertorius", type: "Roman", start: -123, end: -72,
                   lifeSummary: "Quintus Sertorius was a Roman statesman and general, a supporter of Marius, who famously led a formidable and prolonged resistance against Sulla and the Roman Republic in Hispania (modern Spain). He established a de facto independent Roman state there, earning the loyalty of native tribes and challenging Rome's authority for years.",
@@ -596,7 +699,6 @@
             const keyAccomplishmentsOutput = document.getElementById('keyAccomplishmentsOutput');
             const legacyAnalysisOutput = document.getElementById('legacyAnalysisOutput');
             const comparisonCharacterOutput = document.getElementById('comparisonCharacterOutput');
-            // Removed interactingCharactersOutput as its section is removed
 
             // Map to store character bar DOM elements for scrolling
             const characterBarElements = new Map();
@@ -604,7 +706,7 @@
 
             // Define scaling factors and bar dimensions for the VERTICAL timeline
             const pixelsPerYear = 1.5;
-            const barWidth = 120;
+            const barWidth = 120; // This is the base width for JS calculations
             const laneSpacing = 10;
 
             // --- FOCUSED RANGE ---
@@ -633,6 +735,8 @@
                 for (let i = 0; i < lanes.length; i++) {
                     let canFitInLane = true;
                     for (const existingChar of lanes[i]) {
+                        // The logic here remains based on fixed positions for collision detection
+                        // CSS media queries will adjust visual widths without changing this underlying calculation
                         if (char.start < existingChar.end && char.end > existingChar.start) {
                             canFitInLane = false;
                             break;
@@ -654,7 +758,7 @@
             });
 
             const totalLanesWidth = lanes.length * (barWidth + laneSpacing);
-            timelineContentArea.style.width = `${totalLanesWidth + 100}px`;
+            timelineContentArea.style.minWidth = `${totalLanesWidth + 100}px`; // Ensure content area can scroll horizontally
 
 
             // --- Render Vertical Year Axis and Horizontal Grid Lines (FLIPPED) ---
@@ -684,17 +788,17 @@
             filteredCharacters.forEach(char => {
                 const bar = document.createElement('div');
                 bar.className = `character-bar ${char.type.toLowerCase()}`;
-                bar.style.width = `${barWidth}px`;
-                bar.style.padding = '10px 5px';
-                bar.style.zIndex = '10';
+                // The width is set by CSS classes; this line becomes less critical for final visual width
+                // but barWidth here is still used for *left* positioning in JS
+                bar.style.left = `${char.laneIndex * (barWidth + laneSpacing)}px`;
 
                 const barTop = (char.start - minYear) * pixelsPerYear;
                 const barHeight = (char.end - char.start) * pixelsPerYear;
-                const barLeft = char.laneIndex * (barWidth + laneSpacing);
+
 
                 bar.style.top = `${barTop}px`;
-                bar.style.left = `${barLeft}px`;
-                bar.style.height = `${Math.max(20, barHeight)}px`;
+                bar.style.height = `${Math.max(20, barHeight)}px`; // Ensure minimum height
+
 
                 characterBarElements.set(char.name, bar);
 
@@ -768,31 +872,6 @@
                 }
             }
 
-            // REMOVED: displayInteractingCharacters function
-            /*
-            function displayInteractingCharacters(characterName) {
-                interactingCharactersOutput.innerHTML = ''; // Clear previous content
-
-                const interactedWith = interactions[characterName];
-                if (interactedWith && interactedWith.length > 0) {
-                    interactedWith.forEach(interactedName => {
-                        if (characterBarElements.has(interactedName)) {
-                            const link = document.createElement('span');
-                            link.className = 'character-link';
-                            link.textContent = interactedName;
-                            link.onclick = () => openCharacterModal(interactedName);
-                            interactingCharactersOutput.appendChild(link);
-                        }
-                    });
-                    if (interactingCharactersOutput.innerHTML === '') {
-                        interactingCharactersOutput.textContent = "No known interactions with characters on this timeline.";
-                    }
-                } else {
-                    interactingCharactersOutput.textContent = "No specific interactions listed for this character.";
-                }
-            }
-            */
-
 
             // --- Unified Modal Open Function (NO API CALLS HERE) ---
             function openCharacterModal(characterName) {
@@ -811,7 +890,6 @@
                 displayKeyAccomplishments(character);
                 displayLegacyAnalysis(character);
                 displayComparisonCharacter(characterName);
-                // REMOVED: Call to displayInteractingCharacters(characterName);
 
                 // Scroll to the character bar
                 const targetBar = characterBarElements.get(characterName);
@@ -819,8 +897,10 @@
                     const barRect = targetBar.getBoundingClientRect();
                     const timelineRect = timelineContainer.getBoundingClientRect();
 
-                    const scrollX = barRect.left - timelineRect.left + timelineContainer.scrollLeft - (timelineContainer.offsetWidth / 2) + (barRect.width / 2);
-                    const scrollY = barRect.top - timelineRect.top + timelineContainer.scrollTop - (timelineContainer.offsetHeight / 2) + (barRect.height / 2);
+                    // Calculate scroll position relative to the timeline container
+                    // Goal: Center the clicked bar in the timeline container's visible area
+                    const scrollX = (barRect.left - timelineRect.left) + timelineContainer.scrollLeft - (timelineContainer.offsetWidth / 2) + (barRect.width / 2);
+                    const scrollY = (barRect.top - timelineRect.top) + timelineContainer.scrollTop - (timelineContainer.offsetHeight / 2) + (barRect.height / 2);
 
                     timelineContainer.scrollTo({
                         left: scrollX,
